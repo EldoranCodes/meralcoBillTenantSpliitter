@@ -3,351 +3,251 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bill Splitter - Multi Tenant</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Electricity Bill Splitter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #f5f7fa; min-height: 100vh; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { text-align: center; color: #2c3e50; margin-bottom: 24px; }
+    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card h2 { color: #34495e; margin-bottom: 16px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+    .form-group input { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+    .form-group input:focus { outline: none; border-color: #3498db; }
+    .rate-display { background: #e8f5e9; padding: 12px; border-radius: 6px; text-align: center; margin-top: 12px; }
+    .rate-display .value { font-size: 1.4rem; font-weight: bold; color: #2e7d32; }
+    .rate-display .label { font-size: 0.8rem; color: #666; }
+    .tenant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .tenant-header h2 { border: none; padding: 0; margin: 0; }
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-primary:hover { background: #2980b9; }
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-danger { background: #e74c3c; color: white; padding: 8px 12px; font-size: 0.8rem; }
+    .btn-success { background: #27ae60; color: white; width: 100%; padding: 14px; font-size: 1rem; }
+    .btn-success:hover { background: #219a52; }
+    .tenant-list { display: flex; flex-direction: column; gap: 12px; }
+    .tenant-card { display: grid; grid-template-columns: 60px 1fr 100px 100px 100px 40px; gap: 10px; align-items: center; background: #f8f9fa; padding: 12px; border-radius: 8px; }
+    .tenant-card .tenant-num { font-weight: bold; color: #3498db; text-align: center; }
+    .tenant-card input { padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; }
+    .tenant-card .consumption { text-align: center; color: #666; font-size: 0.9rem; }
+    .results-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .results-table th, .results-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    .results-table th { background: #f8f9fa; font-weight: 600; color: #34495e; }
+    .results-table .num { text-align: right; }
+    .results-table .total-row { background: #e8f5e9; font-weight: bold; }
+    .difference-info { background: #fff3e0; padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 0.9rem; color: #e65100; }
+    .validation { padding: 12px; border-radius: 6px; margin-top: 12px; text-align: center; }
+    .validation.success { background: #e8f5e9; color: #2e7d32; }
+    .validation.error { background: #ffebee; color: #c62828; }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+    .tenant-bill-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; color: white; }
+    .tenant-bill-card .tenant-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; }
+    .tenant-bill-card .consumption-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .tenant-bill-card .label { opacity: 0.9; font-size: 0.9rem; }
+    .tenant-bill-card .value { font-weight: 600; }
+    .tenant-bill-card .bill-amount { font-size: 1.4rem; font-weight: bold; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); }
+    .total-card { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; color: white; }
+    .total-card .total-label { font-size: 1.1rem; }
+    .total-card .total-value { font-size: 1.5rem; font-weight: bold; }
+    .empty-state { text-align: center; color: #999; padding: 40px; }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen py-8 px-4">
-  <div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div class="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-4">
-        <h1 class="text-2xl font-bold text-white"><i class="fas fa-bolt mr-2"></i>Bill Splitter</h1>
-        <p class="text-blue-100 text-sm">Split electricity bills among multiple tenants</p>
-      </div>
-
-      <div class="p-6 space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Rate (₱/kWh)</label>
-            <input type="number" id="ratePerKwh" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g. 15.16">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Total kWh</label>
-            <input type="number" id="totalKwh" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="1084">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Total Bill (₱)</label>
-            <input type="number" id="totalBill" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="16431.76">
-          </div>
+<body>
+  <div class="container">
+    <h1>⚡ Electricity Bill Splitter</h1>
+    
+    <div class="card">
+      <h2>Main Meter Billing</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Total Billing Price (₱)</label>
+          <input type="number" id="mainBilling" placeholder="e.g. 16431.76" step="0.01" onchange="calculateRate()">
         </div>
-        <p class="text-xs text-gray-500">Enter Rate + Total kWh to auto-calculate Total Bill, or enter Total Bill directly.</p>
-
-        <div class="border-t pt-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-800"><i class="fas fa-plus-circle mr-2"></i>Additional Charges</h2>
-            <button onclick="addAdditionalCharge()" class="px-3 py-1 text-sm bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg transition flex items-center gap-1">
-              <i class="fas fa-plus"></i> Add
-            </button>
-          </div>
-          <div id="additionalChargesContainer" class="space-y-2"></div>
-        </div>
-
-        <div class="border-t pt-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-800"><i class="fas fa-users mr-2"></i>Tenants</h2>
-            <button onclick="addTenant()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2">
-              <i class="fas fa-plus"></i> Add Tenant
-            </button>
-          </div>
-          
-          <div id="tenantsContainer" class="space-y-3"></div>
-        </div>
-
-        <button onclick="calculate()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition text-lg">
-          <i class="fas fa-calculator mr-2"></i>Calculate
-        </button>
-
-        <div id="results" class="hidden">
-          <div class="border-t pt-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4"><i class="fas fa-receipt mr-2"></i>This Month's Breakdown</h2>
-            <div id="resultsContent" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-          </div>
-        </div>
-
-        <div id="debtSection" class="hidden border-t pt-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-800"><i class="fas fa-history mr-2"></i>Tenant Debt History</h2>
-            <button onclick="clearHistory()" class="px-3 py-1 text-sm text-red-600 hover:text-red-800">Clear History</button>
-          </div>
-          <div id="debtContent" class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-4 py-2 text-left">Tenant</th>
-                  <th class="px-4 py-2 text-right">Current</th>
-                  <th class="px-4 py-2 text-right">Previous Debt</th>
-                  <th class="px-4 py-2 text-right">Total Owed</th>
-                  <th class="px-4 py-2 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="debtTable"></tbody>
-            </table>
-          </div>
-          <button onclick="settleDebt()" class="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition">
-            <i class="fas fa-check-double mr-2"></i>Settle All Debts
-          </button>
+        <div class="form-group">
+          <label>Main Meter Consumption (kWh)</label>
+          <input type="number" id="mainConsumption" placeholder="e.g. 1084" onchange="calculateRate()">
         </div>
       </div>
+      <div class="rate-display">
+        <div class="label">Calculated Rate per kWh</div>
+        <div class="value" id="rateDisplay">₱0.00</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tenant-header">
+        <h2>Submeter Tenants (1-10)</h2>
+        <div>
+          <button class="btn btn-secondary" onclick="addTenant()">+ Add Tenant</button>
+        </div>
+      </div>
+      <div id="tenantList" class="tenant-list"></div>
+    </div>
+
+    <button class="btn btn-success" onclick="calculateBilling()">Calculate All Tenants Billing</button>
+
+    <div class="card" id="resultsCard" style="display: none;">
+      <h2>Billing Results</h2>
+      <div id="differenceInfo" class="difference-info"></div>
+      <div id="totalSubmeterConsumption" class="difference-info" style="background: #e3f2fd; color: #1565c0;"></div>
+      <div id="validation" class="validation"></div>
+      <div id="resultsGrid" class="results-grid"></div>
+      <div id="totalCard" class="total-card"></div>
     </div>
   </div>
 
   <script>
-    let tenantCount = 0;
     let tenants = [];
-    let chargeCount = 0;
 
-    function loadTenants() {
-      const saved = localStorage.getItem('billSplitter_tenants');
-      if (saved) {
-        tenants = JSON.parse(saved);
-        tenants.forEach((t, i) => addTenantField(t.name, t.kwh));
-      } else {
-        for (let i = 0; i < 4; i++) addTenantField(`Tenant ${i + 1}`, '');
-      }
+    function init() {
+      addTenant();
     }
 
-    function saveTenants() {
-      const tenantData = tenants.map(t => ({ name: t.name, kwh: t.kwh }));
-      localStorage.setItem('billSplitter_tenants', JSON.stringify(tenantData));
+    function calculateRate() {
+      const mainBilling = parseFloat(document.getElementById('mainBilling').value);
+      const mainConsumption = parseFloat(document.getElementById('mainConsumption').value);
       
-      const ratePerKwh = document.getElementById('ratePerKwh').value;
-      const totalKwh = document.getElementById('totalKwh').value;
-      const totalBill = document.getElementById('totalBill').value;
-      localStorage.setItem('billSplitter_rates', JSON.stringify({ ratePerKwh, totalKwh, totalBill }));
-    }
-
-    function addTenantField(name = '', kwh = '') {
-      tenantCount++;
-      const container = document.getElementById('tenantsContainer');
-      const div = document.createElement('div');
-      div.className = 'flex gap-2 items-center tenant-row';
-      div.dataset.id = tenantCount;
-      div.innerHTML = `
-        <input type="text" value="${name}" placeholder="Tenant name" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 tenant-name">
-        <input type="number" value="${kwh}" placeholder="kWh" class="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 tenant-kwh">
-        <button onclick="removeTenant(${tenantCount})" class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition">
-          <i class="fas fa-times"></i>
-        </button>
-      `;
-      container.appendChild(div);
+      if (mainBilling && mainConsumption) {
+        const ratePerKwh = mainBilling / mainConsumption;
+        document.getElementById('rateDisplay').textContent = `₱${ratePerKwh.toFixed(4)}`;
+      } else {
+        document.getElementById('rateDisplay').textContent = `₱0.00`;
+      }
     }
 
     function addTenant() {
-      tenantCount++;
-      addTenantField(`Tenant ${tenantCount}`, '');
+      if (tenants.length >= 10) {
+        alert('Maximum 10 tenants allowed');
+        return;
+      }
+      tenants.push({ name: '', oldRead: 0, newRead: 0 });
+      renderTenants();
     }
 
-    function addAdditionalCharge(name = '', amount = '') {
-      chargeCount++;
-      const container = document.getElementById('additionalChargesContainer');
-      const div = document.createElement('div');
-      div.className = 'flex gap-2 items-center charge-row';
-      div.dataset.id = chargeCount;
-      div.innerHTML = `
-        <input type="text" value="${name}" placeholder="Charge name (e.g. Water, Pest Control)" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 charge-name">
-        <input type="number" value="${amount}" placeholder="Amount (₱)" step="0.01" class="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 charge-amount">
-        <button onclick="removeAdditionalCharge(${chargeCount})" class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition">
-          <i class="fas fa-times"></i>
-        </button>
-      `;
-      container.appendChild(div);
+    function removeTenant(index) {
+      if (tenants.length <= 1) {
+        alert('At least 1 tenant required');
+        return;
+      }
+      tenants.splice(index, 1);
+      renderTenants();
     }
 
-    function removeAdditionalCharge(id) {
-      const row = document.querySelector(`.charge-row[data-id="${id}"]`);
-      if (row) row.remove();
+    function updateTenant(index, field, value) {
+      tenants[index][field] = field === 'name' ? value : parseFloat(value) || 0;
+      updateTenantConsumption(index);
     }
 
-    function getAdditionalCharges() {
-      const rows = document.querySelectorAll('.charge-row');
-      const charges = [];
-      rows.forEach(row => {
-        const name = row.querySelector('.charge-name').value;
-        const amount = parseFloat(row.querySelector('.charge-amount').value) || 0;
-        if (name || amount) charges.push({ name, amount });
-      });
-      return charges;
-    }
-
-    function loadAdditionalCharges() {
-      const saved = localStorage.getItem('billSplitter_additionalCharges');
-      if (saved) {
-        const charges = JSON.parse(saved);
-        charges.forEach(c => addAdditionalCharge(c.name, c.amount));
+    function updateTenantConsumption(index) {
+      const t = tenants[index];
+      const card = document.querySelectorAll('.tenant-card')[index];
+      if (card && t.oldRead > 0 && t.newRead > 0) {
+        const consumption = t.newRead >= t.oldRead ? t.newRead - t.oldRead : 0;
+        card.querySelector('.consumption').textContent = `${consumption} kWh`;
+      } else {
+        card.querySelector('.consumption').textContent = `0 kWh`;
       }
     }
 
-    function saveAdditionalCharges() {
-      const chargeData = getAdditionalCharges();
-      localStorage.setItem('billSplitter_additionalCharges', JSON.stringify(chargeData));
+    function getConsumption(index) {
+      const t = tenants[index];
+      return t.newRead >= t.oldRead ? t.newRead - t.oldRead : 0;
     }
 
-    function removeTenant(id) {
-      const row = document.querySelector(`.tenant-row[data-id="${id}"]`);
-      if (row) row.remove();
+    function renderTenants() {
+      const container = document.getElementById('tenantList');
+      container.innerHTML = tenants.map((t, i) => `
+        <div class="tenant-card">
+          <div class="tenant-num">Tenant ${i + 1}</div>
+          <input type="text" placeholder="Name" value="${t.name}" onchange="updateTenant(${i}, 'name', this.value)">
+          <input type="number" placeholder="Old" value="${t.oldRead || ''}" onchange="updateTenant(${i}, 'oldRead', this.value)">
+          <input type="number" placeholder="New" value="${t.newRead || ''}" onchange="updateTenant(${i}, 'newRead', this.value)">
+          <div class="consumption">${getConsumption(i)} kWh</div>
+          <button class="btn btn-danger" onclick="removeTenant(${i})">×</button>
+        </div>
+      `).join('');
     }
 
-    function getTenantData() {
-      const rows = document.querySelectorAll('.tenant-row');
-      const data = [];
-      rows.forEach(row => {
-        const name = row.querySelector('.tenant-name').value;
-        const kwh = parseFloat(row.querySelector('.tenant-kwh').value) || 0;
-        if (name || kwh) data.push({ name, kwh });
-      });
-      return data;
-    }
+    function calculateBilling() {
+      const mainBilling = parseFloat(document.getElementById('mainBilling').value);
+      const mainConsumption = parseFloat(document.getElementById('mainConsumption').value);
 
-    function calculate() {
-      const ratePerKwh = parseFloat(document.getElementById('ratePerKwh').value) || 0;
-      const totalKwh = parseFloat(document.getElementById('totalKwh').value) || 0;
-      let totalBill = parseFloat(document.getElementById('totalBill').value) || 0;
-      
-      if (ratePerKwh > 0 && totalKwh > 0 && totalBill === 0) {
-        totalBill = ratePerKwh * totalKwh;
-        document.getElementById('totalBill').value = totalBill.toFixed(2);
-      }
-
-      const currentTenants = getTenantData();
-      const additionalCharges = getAdditionalCharges();
-      
-      if (currentTenants.length === 0) {
-        alert('Please add at least one tenant');
+      if (!mainBilling || !mainConsumption) {
+        alert('Please enter main billing price and consumption');
         return;
       }
 
-      const effectiveRate = totalKwh > 0 ? totalBill / totalKwh : ratePerKwh;
-      const totalTenantKwh = currentTenants.reduce((sum, t) => sum + t.kwh, 0);
-      const sharedKwh = Math.max(0, totalKwh - totalTenantKwh);
-      const sharedCost = sharedKwh * effectiveRate;
-      const sharedPerTenant = currentTenants.length > 0 ? sharedCost / currentTenants.length : 0;
+      calculateRate();
 
-      const totalAdditionalCharges = additionalCharges.reduce((sum, c) => sum + c.amount, 0);
-      const additionalPerTenant = currentTenants.length > 0 ? totalAdditionalCharges / currentTenants.length : 0;
+      const ratePerKwh = mainBilling / mainConsumption;
 
-      const currentAmounts = currentTenants.map(t => {
-        return (t.kwh * effectiveRate) + sharedPerTenant + additionalPerTenant;
-      });
+      const tenantConsumptions = tenants.map((_, i) => getConsumption(i));
+      const totalSubmeterConsumption = tenantConsumptions.reduce((a, b) => a + b, 0);
+      const diff = mainConsumption - totalSubmeterConsumption;
+      
+      let diffPerTenant;
+      if (totalSubmeterConsumption > mainConsumption) {
+        diffPerTenant = diff / tenants.length;
+      } else {
+        diffPerTenant = diff / tenants.length;
+      }
 
-      const resultsDiv = document.getElementById('results');
-      const resultsContent = document.getElementById('resultsContent');
-      resultsDiv.classList.remove('hidden');
-      resultsContent.innerHTML = '';
+      let diffMessage = '';
+      if (diff !== 0) {
+        const action = diff > 0 ? 'deducted from' : 'added to';
+        diffMessage = `Difference: ${Math.abs(diff).toFixed(2)} kWh (${Math.abs(diffPerTenant).toFixed(2)} per tenant will be ${action} consumption)`;
+      }
+      document.getElementById('differenceInfo').textContent = diffMessage;
+      document.getElementById('totalSubmeterConsumption').textContent = `Total Submeter Consumption: ${totalSubmeterConsumption.toFixed(2)} kWh`;
 
-      currentTenants.forEach((tenant, i) => {
-        const consumptionCost = tenant.kwh * effectiveRate;
-        const total = consumptionCost + sharedPerTenant + additionalPerTenant;
-        
-        let chargesHtml = '';
-        if (additionalCharges.length > 0) {
-          chargesHtml = `<div class="text-sm text-blue-700">Additional: ₱${additionalPerTenant.toFixed(2)}</div>`;
+      const adjustedConsumptions = tenantConsumptions.map(c => {
+        if (totalSubmeterConsumption > mainConsumption) {
+          return c - diffPerTenant;
+        } else {
+          return c + diffPerTenant;
         }
-
-        const card = document.createElement('div');
-        card.className = 'bg-blue-50 border border-blue-200 rounded-lg p-4';
-        card.innerHTML = `
-          <div class="font-semibold text-blue-900">${tenant.name || `Tenant ${i + 1}`}</div>
-          <div class="text-sm text-blue-700 mt-1">Usage: ${tenant.kwh} kWh</div>
-          <div class="text-sm text-blue-700">Consumption: ₱${consumptionCost.toFixed(2)}</div>
-          <div class="text-sm text-blue-700">Shared: ₱${sharedPerTenant.toFixed(2)}</div>
-          ${chargesHtml}
-          <div class="text-xl font-bold text-blue-900 mt-2">₱${total.toFixed(2)}</div>
-        `;
-        resultsContent.appendChild(card);
       });
+      const bills = adjustedConsumptions.map(c => c * ratePerKwh);
+      const totalBill = bills.reduce((a, b) => a + b, 0);
 
-      saveDebt(currentTenants, currentAmounts);
-      showDebtHistory();
-      saveTenants();
-      saveAdditionalCharges();
+      const isValid = Math.abs(totalBill - mainBilling) < 0.01;
+      const validationEl = document.getElementById('validation');
+      validationEl.className = `validation ${isValid ? 'success' : 'error'}`;
+      validationEl.textContent = isValid 
+        ? `✓ Formula validated - Total matches main billing (₱${totalBill.toFixed(2)})`
+        : `⚠ Total mismatch: ₱${totalBill.toFixed(2)} vs ₱${mainBilling.toFixed(2)}`;
+
+      document.getElementById('resultsGrid').innerHTML = tenants.map((t, i) => `
+        <div class="tenant-bill-card">
+          <div class="tenant-name">${t.name || `Tenant ${i + 1}`}</div>
+          <div class="consumption-row">
+            <span class="label">Raw Consumption</span>
+            <span class="value">${tenantConsumptions[i].toFixed(2)} kWh</span>
+          </div>
+          <div class="consumption-row">
+            <span class="label">Adjusted Consumption</span>
+            <span class="value">${adjustedConsumptions[i].toFixed(2)} kWh</span>
+          </div>
+          <div class="consumption-row">
+            <span class="label">Rate</span>
+            <span class="value">₱${ratePerKwh.toFixed(4)}/kWh</span>
+          </div>
+          <div class="bill-amount">₱${bills[i].toFixed(2)}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('totalCard').innerHTML = `
+        <span class="total-label">Total Billing</span>
+        <span class="total-value">₱${totalBill.toFixed(2)}</span>
+      `;
+
+      document.getElementById('resultsCard').style.display = 'block';
     }
 
-    function getDebtKey(name) {
-      return `billSplitter_debt_${name.replace(/\s+/g, '_')}`;
-    }
-
-    function saveDebt(currentTenants, currentAmounts) {
-      const today = new Date().toISOString().slice(0, 7);
-      
-      currentTenants.forEach((tenant, i) => {
-        const key = getDebtKey(tenant.name);
-        const debt = parseFloat(localStorage.getItem(key)) || 0;
-        localStorage.setItem(key, (debt + currentAmounts[i]).toFixed(2));
-      });
-
-      localStorage.setItem('billSplitter_lastBill', JSON.stringify({
-        date: today,
-        tenants: currentTenants.map(t => ({ name: t.name, amount: currentAmounts[currentTenants.indexOf(t)] }))
-      }));
-    }
-
-    function showDebtHistory() {
-      const debtSection = document.getElementById('debtSection');
-      const debtTable = document.getElementById('debtTable');
-      debtSection.classList.remove('hidden');
-      debtTable.innerHTML = '';
-
-      const uniqueNames = [...new Set(tenants.map(t => t.name))];
-      
-      if (uniqueNames.length === 0) {
-        const current = getTenantData();
-        current.forEach(t => uniqueNames.push(t.name));
-      }
-
-      uniqueNames.forEach(name => {
-        const debt = parseFloat(localStorage.getItem(getDebtKey(name))) || 0;
-        const row = document.createElement('tr');
-        row.className = 'border-t';
-        row.innerHTML = `
-          <td class="px-4 py-2 font-medium">${name}</td>
-          <td class="px-4 py-2 text-right">₱${debt.toFixed(2)}</td>
-          <td class="px-4 py-2 text-right text-gray-500">-</td>
-          <td class="px-4 py-2 text-right font-bold">₱${debt.toFixed(2)}</td>
-          <td class="px-4 py-2 text-center">
-            <button onclick="settleTenant('${name}')" class="text-green-600 hover:text-green-800 text-sm">Settle</button>
-          </td>
-        `;
-        debtTable.appendChild(row);
-      });
-    }
-
-    function settleTenant(name) {
-      localStorage.removeItem(getDebtKey(name));
-      showDebtHistory();
-    }
-
-    function settleDebt() {
-      if (confirm('Settle all tenant debts? This will reset all balances to zero.')) {
-        const uniqueNames = [...new Set(tenants.map(t => t.name))];
-        uniqueNames.forEach(name => localStorage.removeItem(getDebtKey(name)));
-        showDebtHistory();
-      }
-    }
-
-    function clearHistory() {
-      if (confirm('Clear all debt history? This cannot be undone.')) {
-        const uniqueNames = [...new Set(tenants.map(t => t.name))];
-        uniqueNames.forEach(name => localStorage.removeItem(getDebtKey(name)));
-        showDebtHistory();
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadTenants();
-      loadAdditionalCharges();
-      loadRateSettings();
-      showDebtHistory();
-    });
-
-    function loadRateSettings() {
-      const saved = localStorage.getItem('billSplitter_rates');
-      if (saved) {
-        const { ratePerKwh, totalKwh, totalBill } = JSON.parse(saved);
-        if (ratePerKwh) document.getElementById('ratePerKwh').value = ratePerKwh;
-        if (totalKwh) document.getElementById('totalKwh').value = totalKwh;
-        if (totalBill) document.getElementById('totalBill').value = totalBill;
-      }
-    }
+    init();
   </script>
 </body>
 </html>
