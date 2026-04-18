@@ -73,9 +73,32 @@
       .tenant-header { flex-direction: column; gap: 12px; align-items: stretch; }
       .tenant-header .btn { width: 100%; }
     }
-      .total-card .total-value { font-size: 1.3rem; }
-      .tenant-header { flex-direction: column; gap: 12px; align-items: stretch; }
-      .tenant-header .btn { width: 100%; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; overflow: auto; }
+    .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: white; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow: auto; display: flex; flex-direction: column; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #eee; }
+    .modal-header h2 { margin: 0; font-size: 1.2rem; }
+    .modal-body { padding: 20px; flex: 1; overflow: auto; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #eee; display: flex; gap: 12px; justify-content: flex-end; }
+
+    .detailed-section { margin-bottom: 24px; }
+    .detailed-section h3 { color: #2c3e50; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #3498db; }
+    .detailed-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .detailed-table th, .detailed-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+    .detailed-table th { background: #f8f9fa; font-weight: 600; color: #34495e; }
+    .detailed-table .num { text-align: right; }
+    .detailed-table .total-row { background: #e8f5e9; font-weight: bold; }
+    .detailed-summary { background: #f8f9fa; padding: 16px; border-radius: 8px; }
+    .detailed-summary .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+    .detailed-summary .summary-row:last-child { border-bottom: none; font-weight: bold; }
+
+    @media print {
+      body * { visibility: hidden; }
+      .modal, .modal * { visibility: visible; }
+      .modal { position: absolute; left: 0; top: 0; width: 100%; height: auto; background: white; }
+      .modal-content { max-width: 100%; max-height: none; box-shadow: none; }
+      .modal-header, .modal-footer { display: none; }
     }
 
   </style>
@@ -113,6 +136,7 @@
     </div>
 
     <button class="btn btn-success" onclick="calculateBilling()">Calculate All Tenants Billing</button>
+    <button class="btn btn-primary" id="viewDetailedBtn" style="display: none; width: 100%; margin-top: 12px;" onclick="viewDetailed()">View Detailed</button>
 
     <div class="card" id="resultsCard" style="display: none;">
       <h2>Billing Results</h2>
@@ -122,10 +146,24 @@
       <div id="resultsGrid" class="results-grid"></div>
       <div id="totalCard" class="total-card"></div>
     </div>
+
+    <div id="detailedModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Detailed Billing Computation</h2>
+          <button class="btn btn-danger" onclick="closeDetailed()">×</button>
+        </div>
+        <div class="modal-body" id="detailedContent"></div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="printDetailed()">Print</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     let tenants = [];
+    let lastCalculation = null;
 
     function init() {
       addTenant();
@@ -269,7 +307,88 @@
         <span class="total-value">₱${totalBill.toFixed(2)}</span>
       `;
 
+      lastCalculation = {
+        mainBilling, mainConsumption, ratePerKwh, tenantConsumptions, 
+        totalSubmeterConsumption, diff, diffPerTenant, adjustedConsumptions, bills, totalBill
+      };
+
       document.getElementById('resultsCard').style.display = 'block';
+      document.getElementById('viewDetailedBtn').style.display = 'block';
+    }
+
+    function viewDetailed() {
+      if (!lastCalculation) return;
+      const { mainBilling, mainConsumption, ratePerKwh, tenantConsumptions, 
+        totalSubmeterConsumption, diff, diffPerTenant, adjustedConsumptions, bills, totalBill } = lastCalculation;
+
+      const diffType = totalSubmeterConsumption > mainConsumption ? 'Deducted' : 'Added';
+      const diffAction = totalSubmeterConsumption > mainConsumption ? 'subtracted from' : 'added to';
+
+      let html = `
+        <div class="detailed-section">
+          <h3>Main Meter Summary</h3>
+          <div class="detailed-summary">
+            <div class="summary-row"><span>Total Billing Price</span><span>₱${mainBilling.toFixed(2)}</span></div>
+            <div class="summary-row"><span>Main Meter Consumption</span><span>${mainConsumption.toFixed(2)} kWh</span></div>
+            <div class="summary-row"><span>Calculated Rate per kWh</span><span>₱${ratePerKwh.toFixed(4)}</span></div>
+          </div>
+        </div>
+        <div class="detailed-section">
+          <h3>Submeter Consumption Summary</h3>
+          <div class="detailed-summary">
+            <div class="summary-row"><span>Total Submeter Reading</span><span>${totalSubmeterConsumption.toFixed(2)} kWh</span></div>
+            <div class="summary-row"><span>Main Meter Reading</span><span>${mainConsumption.toFixed(2)} kWh</span></div>
+            <div class="summary-row"><span>Difference</span><span>${diff.toFixed(2)} kWh</span></div>
+            <div class="summary-row"><span>Difference per Tenant</span><span>${Math.abs(diffPerTenant).toFixed(2)} kWh (${diffType} from each)</span></div>
+          </div>
+        </div>
+        <div class="detailed-section">
+          <h3>Tenant Billing Details</h3>
+          <table class="detailed-table">
+            <thead>
+              <tr><th>#</th><th>Tenant</th><th>Old</th><th>New</th><th>Raw (kWh)</th><th>Adj. (kWh)</th><th>Rate</th><th>Bill (₱)</th></tr>
+            </thead>
+            <tbody>
+      `;
+
+      tenants.forEach((t, i) => {
+        html += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${t.name || `Tenant ${i + 1}`}</td>
+            <td class="num">${t.oldRead}</td>
+            <td class="num">${t.newRead}</td>
+            <td class="num">${tenantConsumptions[i].toFixed(2)}</td>
+            <td class="num">${adjustedConsumptions[i].toFixed(2)}</td>
+            <td class="num">₱${ratePerKwh.toFixed(4)}</td>
+            <td class="num">₱${bills[i].toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            <tr class="total-row">
+              <td colspan="4">TOTAL</td>
+              <td class="num">${tenantConsumptions.reduce((a,b)=>a+b,0).toFixed(2)}</td>
+              <td class="num">${adjustedConsumptions.reduce((a,b)=>a+b,0).toFixed(2)}</td>
+              <td></td>
+              <td class="num">₱${totalBill.toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      `;
+
+      document.getElementById('detailedContent').innerHTML = html;
+      document.getElementById('detailedModal').classList.add('active');
+    }
+
+    function closeDetailed() {
+      document.getElementById('detailedModal').classList.remove('active');
+    }
+
+    function printDetailed() {
+      window.print();
     }
 
     init();
