@@ -29,10 +29,15 @@
     .btn-success { background: #27ae60; color: white; width: 100%; padding: 14px; font-size: 1rem; }
     .btn-success:hover { background: #219a52; }
     .tenant-list { display: flex; flex-direction: column; gap: 12px; }
-    .tenant-card { display: grid; grid-template-columns: 60px 1fr 100px 100px 100px 40px; gap: 10px; align-items: center; background: #f8f9fa; padding: 12px; border-radius: 8px; }
-    .tenant-card .tenant-num { font-weight: bold; color: #3498db; text-align: center; }
-    .tenant-card input { padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; }
-    .tenant-card .consumption { text-align: center; color: #666; font-size: 0.9rem; }
+    .tenant-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .tenant-card-header { display: flex; align-items: center; gap: 10px; }
+    .tenant-card-header .btn-danger { padding: 6px 10px; font-size: 1rem; }
+    .tenant-card .tenant-num { font-weight: bold; color: #3498db; }
+    .tenant-card input { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; }
+    .tenant-card .tenant-name-input { font-size: 1rem; }
+    .tenant-card .tenant-readings { display: flex; gap: 10px; }
+    .tenant-card .tenant-readings input { flex: 1; }
+    .tenant-card .consumption { color: #666; font-size: 0.9rem; font-weight: 500; }
     .results-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     .results-table th, .results-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
     .results-table th { background: #f8f9fa; font-weight: 600; color: #34495e; }
@@ -53,6 +58,26 @@
     .total-card .total-label { font-size: 1.1rem; }
     .total-card .total-value { font-size: 1.5rem; font-weight: bold; }
     .empty-state { text-align: center; color: #999; padding: 40px; }
+  @media (max-width: 600px) {
+      body { padding: 12px; }
+      h1 { font-size: 1.5rem; margin-bottom: 16px; }
+      .card { padding: 16px; border-radius: 8px; }
+      .form-row { grid-template-columns: 1fr; gap: 12px; }
+      .tenant-card { padding: 14px; }
+      .tenant-card-header { justify-content: space-between; }
+      .tenant-readings { flex-direction: column; }
+      .results-grid { grid-template-columns: 1fr; gap: 12px; }
+      .tenant-bill-card { padding: 16px; }
+      .total-card { flex-direction: column; gap: 8px; text-align: center; }
+      .total-card .total-value { font-size: 1.3rem; }
+      .tenant-header { flex-direction: column; gap: 12px; align-items: stretch; }
+      .tenant-header .btn { width: 100%; }
+    }
+      .total-card .total-value { font-size: 1.3rem; }
+      .tenant-header { flex-direction: column; gap: 12px; align-items: stretch; }
+      .tenant-header .btn { width: 100%; }
+    }
+
   </style>
 </head>
 <body>
@@ -138,17 +163,13 @@
 
     function updateTenant(index, field, value) {
       tenants[index][field] = field === 'name' ? value : parseFloat(value) || 0;
-      updateTenantConsumption(index);
-    }
-
-    function updateTenantConsumption(index) {
-      const t = tenants[index];
       const card = document.querySelectorAll('.tenant-card')[index];
-      if (card && t.oldRead > 0 && t.newRead > 0) {
-        const consumption = t.newRead >= t.oldRead ? t.newRead - t.oldRead : 0;
-        card.querySelector('.consumption').textContent = `${consumption} kWh`;
-      } else {
-        card.querySelector('.consumption').textContent = `0 kWh`;
+      if (card) {
+        const t = tenants[index];
+        const consumption = (t.oldRead > 0 && t.newRead > 0 && t.newRead >= t.oldRead) 
+          ? t.newRead - t.oldRead 
+          : 0;
+        card.querySelector('.consumption').textContent = `Usage: ${consumption} kWh`;
       }
     }
 
@@ -161,12 +182,16 @@
       const container = document.getElementById('tenantList');
       container.innerHTML = tenants.map((t, i) => `
         <div class="tenant-card">
-          <div class="tenant-num">Tenant ${i + 1}</div>
-          <input type="text" placeholder="Name" value="${t.name}" onchange="updateTenant(${i}, 'name', this.value)">
-          <input type="number" placeholder="Old" value="${t.oldRead || ''}" onchange="updateTenant(${i}, 'oldRead', this.value)">
-          <input type="number" placeholder="New" value="${t.newRead || ''}" onchange="updateTenant(${i}, 'newRead', this.value)">
-          <div class="consumption">${getConsumption(i)} kWh</div>
-          <button class="btn btn-danger" onclick="removeTenant(${i})">×</button>
+          <div class="tenant-card-header">
+            <button class="btn btn-danger" onclick="removeTenant(${i})">×</button>
+            <span class="tenant-num">Tenant ${i + 1}</span>
+          </div>
+          <input type="text" class="tenant-name-input" placeholder="Name" value="${t.name}" onchange="updateTenant(${i}, 'name', this.value)">
+          <div class="tenant-readings">
+            <input type="number" placeholder="Old" value="${t.oldRead || ''}" onchange="updateTenant(${i}, 'oldRead', this.value)">
+            <input type="number" placeholder="New" value="${t.newRead || ''}" onchange="updateTenant(${i}, 'newRead', this.value)">
+          </div>
+          <div class="consumption">Usage: ${getConsumption(i)} kWh</div>
         </div>
       `).join('');
     }
