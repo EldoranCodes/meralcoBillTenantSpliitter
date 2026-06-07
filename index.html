@@ -4,26 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meralco Bill Splitter</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            heading: ['Lexend', 'sans-serif'],
-            body: ['Source Sans 3', 'sans-serif'],
-          },
-        },
-      },
-    }
-  </script>
+  <link href="styles/output.css" rel="stylesheet">
   <style>
-    body { font-family: 'Source Sans 3', sans-serif; }
-    .font-heading { font-family: 'Lexend', sans-serif; }
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .font-heading { font-family: system-ui, -apple-system, sans-serif; font-weight: 600; }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type="number"] { -moz-appearance: textfield; }
@@ -47,7 +31,7 @@
     <!-- Header -->
     <header class="flex items-center gap-4 mb-2">
       <div class="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center text-white shrink-0">
-        <i data-lucide="zap" class="w-5 h-5"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
       <div>
         <h1 class="text-xl sm:text-2xl font-heading font-bold text-slate-900">Meralco Bill Splitter</h1>
@@ -58,7 +42,7 @@
     <!-- Main Meter Card -->
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
       <h2 class="font-heading font-semibold text-base text-slate-800 mb-4 flex items-center gap-2">
-        <i data-lucide="gauge" class="w-5 h-5 text-blue-600"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-blue-600"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
         Main Meter Billing
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -84,7 +68,7 @@
     <!-- Tenants Card -->
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
       <h2 class="font-heading font-semibold text-base text-slate-800 mb-1 flex items-center gap-2">
-        <i data-lucide="layers" class="w-5 h-5 text-amber-500"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-amber-500"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         Tenant Submeter Readings
       </h2>
       <p class="text-sm text-slate-500 mb-5">Enter old and new meter readings for each tenant</p>
@@ -141,23 +125,23 @@
             <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
               <div class="flex items-center gap-2 mb-3">
                 <span class="w-2 h-2 rounded-full border-2 border-emerald-500 shrink-0"></span>
-                <h4 class="font-heading font-semibold text-xs text-slate-600 uppercase tracking-wider">Sub: Mhiles</h4>
+                <h4 class="font-heading font-semibold text-xs text-slate-600 uppercase tracking-wider">Sub: Zyville</h4>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label for="mhilesOld" class="block text-xs font-medium text-slate-500 mb-1">Old Reading</label>
-                  <input type="number" id="mhilesOld" step="0.01" min="0" placeholder="0"
+                  <label for="zyvilleOld" class="block text-xs font-medium text-slate-500 mb-1">Old Reading</label>
+                  <input type="number" id="zyvilleOld" step="0.01" min="0" placeholder="0"
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
                     oninput="updatePreviews()">
                 </div>
                 <div>
-                  <label for="mhilesNew" class="block text-xs font-medium text-slate-500 mb-1">New Reading</label>
-                  <input type="number" id="mhilesNew" step="0.01" min="0" placeholder="0"
+                  <label for="zyvilleNew" class="block text-xs font-medium text-slate-500 mb-1">New Reading</label>
+                  <input type="number" id="zyvilleNew" step="0.01" min="0" placeholder="0"
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
                     oninput="updatePreviews()">
                 </div>
               </div>
-              <p class="mt-2 text-sm font-medium" id="mhilesConsumption">Consumption: <span class="text-slate-400">0.00</span> kWh</p>
+              <p class="mt-2 text-sm font-medium" id="zyvilleConsumption">Consumption: <span class="text-slate-400">0.00</span> kWh</p>
             </div>
 
             <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
@@ -187,7 +171,7 @@
             <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1.5">Vic's Actual Consumption</p>
             <div class="space-y-0.5 text-slate-700">
               <div class="flex justify-between"><span>Submeter Reading</span><span id="vicRawDisplay">0.00 kWh</span></div>
-              <div class="flex justify-between text-emerald-700"><span>&minus; Mhiles</span><span id="vicMinusMhiles">0.00 kWh</span></div>
+              <div class="flex justify-between text-emerald-700"><span>&minus; Zyville</span><span id="vicMinusZyville">0.00 kWh</span></div>
               <div class="flex justify-between text-purple-700"><span>&minus; Freda</span><span id="vicMinusFreda">0.00 kWh</span></div>
               <div class="border-t border-amber-300 pt-0.5 flex justify-between font-bold text-amber-900"><span>Vic's Actual</span><span id="vicActualDisplay">0.00 kWh</span></div>
             </div>
@@ -200,14 +184,14 @@
     <button id="calculateBtn"
       class="w-full py-3.5 px-6 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-sm rounded-xl transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
       onclick="calculateBilling()">
-      <i data-lucide="calculator" class="w-4 h-4"></i>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="8" x2="12" y1="14" y2="14"/><line x1="8" x2="12" y1="18" y2="18"/><line x1="16" x2="16" y1="14" y2="18"/><line x1="8" x2="16" y1="10" y2="10"/></svg>
       Calculate All Tenants Billing
     </button>
 
     <!-- Results Card -->
     <section id="resultsCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 hidden">
       <h2 class="font-heading font-semibold text-base text-slate-800 mb-1 flex items-center gap-2">
-        <i data-lucide="receipt" class="w-5 h-5 text-emerald-600"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-emerald-600"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
         Billing Results
       </h2>
 
@@ -221,7 +205,7 @@
       <button id="viewDetailedBtn"
         class="no-print mt-4 w-full py-3 px-6 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-heading font-semibold text-sm rounded-xl transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 hidden"
         onclick="openDetailed()">
-        <i data-lucide="file-text" class="w-4 h-4"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
         View Detailed Computation
       </button>
     </section>
@@ -234,7 +218,7 @@
       <div class="flex items-center justify-between p-5 border-b border-slate-200 no-print">
         <h2 class="font-heading font-semibold text-base text-slate-800">Detailed Billing Computation</h2>
         <button onclick="closeDetailed()" class="p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" aria-label="Close">
-          <i data-lucide="x" class="w-5 h-5 text-slate-500"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-slate-500"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
       <div class="p-5 overflow-y-auto space-y-6" id="detailedContent"></div>
@@ -243,7 +227,7 @@
           class="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer">Close</button>
         <button onclick="printDetailed()"
           class="px-4 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium font-heading hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-2">
-          <i data-lucide="printer" class="w-4 h-4"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3h12v6"/><rect width="12" height="8" x="6" y="14" rx="1"/></svg>
           Print
         </button>
       </div>
@@ -251,8 +235,6 @@
   </div>
 
   <script>
-    lucide.createIcons();
-
     function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
     function txt(id, val) { document.getElementById(id).textContent = val; }
     function html(id, val) { document.getElementById(id).innerHTML = val; }
@@ -270,26 +252,26 @@
     function getTenantData() {
       const celOld = getVal('celOld'), celNew = getVal('celNew');
       const vicOld = getVal('vicOld'), vicNew = getVal('vicNew');
-      const mhilesOld = getVal('mhilesOld'), mhilesNew = getVal('mhilesNew');
+      const zyvilleOld = getVal('zyvilleOld'), zyvilleNew = getVal('zyvilleNew');
       const fredaOld = getVal('fredaOld'), fredaNew = getVal('fredaNew');
 
       const celKwh = Math.max(0, celNew - celOld);
-      const mhilesKwh = Math.max(0, mhilesNew - mhilesOld);
+      const zyvilleKwh = Math.max(0, zyvilleNew - zyvilleOld);
       const fredaKwh = Math.max(0, fredaNew - fredaOld);
       const vicRaw = Math.max(0, vicNew - vicOld);
-      const vicKwh = Math.max(0, vicRaw - mhilesKwh - fredaKwh);
+      const vicKwh = Math.max(0, vicRaw - zyvilleKwh - fredaKwh);
 
-      return { celKwh, vicKwh, mhilesKwh, fredaKwh, vicRaw };
+      return { celKwh, vicKwh, zyvilleKwh, fredaKwh, vicRaw };
     }
 
     function updatePreviews() {
-      const { celKwh, vicKwh, mhilesKwh, fredaKwh, vicRaw } = getTenantData();
+      const { celKwh, vicKwh, zyvilleKwh, fredaKwh, vicRaw } = getTenantData();
       html('celConsumption', `Consumption: <span class="text-slate-800 font-semibold">${celKwh.toFixed(2)}</span> kWh`);
-      html('mhilesConsumption', `Consumption: <span class="text-slate-800 font-semibold">${mhilesKwh.toFixed(2)}</span> kWh`);
+      html('zyvilleConsumption', `Consumption: <span class="text-slate-800 font-semibold">${zyvilleKwh.toFixed(2)}</span> kWh`);
       html('fredaConsumption', `Consumption: <span class="text-slate-800 font-semibold">${fredaKwh.toFixed(2)}</span> kWh`);
       txt('vicRawConsumption', vicRaw.toFixed(2));
       txt('vicRawDisplay', `${vicRaw.toFixed(2)} kWh`);
-      txt('vicMinusMhiles', `${mhilesKwh.toFixed(2)} kWh`);
+      txt('vicMinusZyville', `${zyvilleKwh.toFixed(2)} kWh`);
       txt('vicMinusFreda', `${fredaKwh.toFixed(2)} kWh`);
       txt('vicActualDisplay', `${vicKwh.toFixed(2)} kWh`);
     }
@@ -305,26 +287,30 @@
 
       updateRate();
       const rate = mainBill / mainKwh;
-      const { celKwh, vicKwh, mhilesKwh, fredaKwh } = getTenantData();
-      const totalKwh = celKwh + mhilesKwh + fredaKwh + vicKwh;
+      const { celKwh, vicKwh, zyvilleKwh, fredaKwh } = getTenantData();
+      const celOld = getVal('celOld'), celNew = getVal('celNew');
+      const zyvilleOld = getVal('zyvilleOld'), zyvilleNew = getVal('zyvilleNew');
+      const fredaOld = getVal('fredaOld'), fredaNew = getVal('fredaNew');
+      const vicOld = getVal('vicOld'), vicNew = getVal('vicNew');
+      const totalKwh = celKwh + zyvilleKwh + fredaKwh + vicKwh;
       const diff = mainKwh - totalKwh;
       const adjust = diff / 4;
 
       const adj = {
         cel: celKwh + adjust,
-        mhiles: mhilesKwh + adjust,
+        zyville: zyvilleKwh + adjust,
         freda: fredaKwh + adjust,
         vic: vicKwh + adjust,
       };
 
       const bills = {
         cel: adj.cel * rate,
-        mhiles: adj.mhiles * rate,
+        zyville: adj.zyville * rate,
         freda: adj.freda * rate,
         vic: adj.vic * rate,
       };
 
-      const totalBill = bills.cel + bills.mhiles + bills.freda + bills.vic;
+      const totalBill = bills.cel + bills.zyville + bills.freda + bills.vic;
       const isValid = Math.abs(totalBill - mainBill) < 0.01;
 
       const diffEl = document.getElementById('differenceInfo');
@@ -345,14 +331,14 @@
       const valEl = document.getElementById('validationMsg');
       valEl.className = `mt-3 rounded-xl p-4 text-sm font-medium ${isValid ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-red-50 border border-red-200 text-red-800'}`;
       valEl.innerHTML = isValid
-        ? `<i data-lucide="check-circle" class="w-4 h-4 inline -mt-0.5 mr-1"></i> Validation passed &mdash; Total (₱${totalBill.toFixed(2)}) matches main billing (₱${mainBill.toFixed(2)})`
-        : `<i data-lucide="alert-triangle" class="w-4 h-4 inline -mt-0.5 mr-1"></i> Mismatch: Total (₱${totalBill.toFixed(2)}) vs Main Billing (₱${mainBill.toFixed(2)})`;
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 inline -mt-0.5 mr-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Validation passed &mdash; Total (₱${totalBill.toFixed(2)}) matches main billing (₱${mainBill.toFixed(2)})`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 inline -mt-0.5 mr-1"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Mismatch: Total (₱${totalBill.toFixed(2)}) vs Main Billing (₱${mainBill.toFixed(2)})`;
       valEl.classList.remove('hidden');
 
-      const dotColors = { Cel: '#3B82F6', Mhiles: '#10B981', Freda: '#A855F7', Vic: '#F59E0B' };
+      const dotColors = { Cel: '#3B82F6', Zyville: '#10B981', Freda: '#A855F7', Vic: '#F59E0B' };
       const tenants = [
         { name: 'Cel', raw: celKwh, adj: adj.cel, bill: bills.cel },
-        { name: 'Mhiles', raw: mhilesKwh, adj: adj.mhiles, bill: bills.mhiles },
+        { name: 'Zyville', raw: zyvilleKwh, adj: adj.zyville, bill: bills.zyville },
         { name: 'Freda', raw: fredaKwh, adj: adj.freda, bill: bills.freda },
         { name: 'Vic', raw: vicKwh, adj: adj.vic, bill: bills.vic },
       ];
@@ -387,10 +373,9 @@
       document.getElementById('resultsCard').classList.remove('hidden');
       document.getElementById('viewDetailedBtn').classList.remove('hidden');
 
-      window.__lastCalc = { mainBill, mainKwh, rate, celKwh, vicKwh, mhilesKwh, fredaKwh, totalKwh, diff, adjust, adj, bills, totalBill };
+      window.__lastCalc = { mainBill, mainKwh, rate, celKwh, vicKwh, zyvilleKwh, fredaKwh, totalKwh, diff, adjust, adj, bills, totalBill, readings: { cel: { old: celOld, new: celNew }, zyville: { old: zyvilleOld, new: zyvilleNew }, freda: { old: fredaOld, new: fredaNew }, vic: { old: vicOld, new: vicNew } } };
 
       document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      lucide.createIcons();
     }
 
     function openDetailed() {
@@ -399,7 +384,7 @@
 
       const tData = [
         { name: 'Cel', raw: d.celKwh, adj: d.adj.cel, bill: d.bills.cel },
-        { name: 'Mhiles', raw: d.mhilesKwh, adj: d.adj.mhiles, bill: d.bills.mhiles },
+        { name: 'Zyville', raw: d.zyvilleKwh, adj: d.adj.zyville, bill: d.bills.zyville },
         { name: 'Freda', raw: d.fredaKwh, adj: d.adj.freda, bill: d.bills.freda },
         { name: 'Vic', raw: d.vicKwh, adj: d.adj.vic, bill: d.bills.vic },
       ];
@@ -422,6 +407,35 @@
             <div class="flex justify-between"><span class="text-slate-500">Main Meter Reading</span><span class="font-medium">${d.mainKwh.toFixed(2)} kWh</span></div>
             <div class="flex justify-between ${Math.abs(d.diff) < 0.001 ? 'text-emerald-700' : 'text-orange-700'} font-semibold"><span>Difference</span><span>${d.diff.toFixed(2)} kWh</span></div>
             <div class="flex justify-between text-slate-500"><span>Adjustment per Tenant</span><span class="font-medium">${Math.abs(d.adjust).toFixed(2)} kWh (${diffDir})</span></div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-heading font-semibold text-sm text-slate-800 mb-3 pb-2 border-b-2 border-sky-500">Meter Readings</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
+                  <th class="text-left p-3 font-semibold">Tenant</th>
+                  <th class="text-right p-3 font-semibold">Old Reading</th>
+                  <th class="text-right p-3 font-semibold">New Reading</th>
+                  <th class="text-right p-3 font-semibold">Consumption (kWh)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${['cel', 'zyville', 'freda', 'vic'].map(k => {
+                  const r = d.readings[k];
+                  const raw = k === 'vic' ? d.vicKwh + d.zyvilleKwh + d.fredaKwh : d[k + 'Kwh'];
+                  return `
+                    <tr class="border-b border-slate-100">
+                      <td class="p-3 font-medium text-slate-700 capitalize">${k === 'zyville' ? 'Zyville' : k.charAt(0).toUpperCase() + k.slice(1)}</td>
+                      <td class="p-3 text-right text-slate-600">${r.old.toFixed(2)}</td>
+                      <td class="p-3 text-right text-slate-600">${r.new.toFixed(2)}</td>
+                      <td class="p-3 text-right font-semibold text-slate-800">${raw.toFixed(2)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
           </div>
         </div>
         <div>
@@ -450,7 +464,7 @@
                 <tr class="bg-slate-50 font-bold text-slate-800">
                   <td class="p-3">TOTAL</td>
                   <td class="p-3 text-right">${d.totalKwh.toFixed(2)}</td>
-                  <td class="p-3 text-right">${(d.adj.cel + d.adj.mhiles + d.adj.freda + d.adj.vic).toFixed(2)}</td>
+                  <td class="p-3 text-right">${(d.adj.cel + d.adj.zyville + d.adj.freda + d.adj.vic).toFixed(2)}</td>
                   <td class="p-3 text-right"></td>
                   <td class="p-3 text-right text-blue-700">₱${d.totalBill.toFixed(2)}</td>
                 </tr>
@@ -463,7 +477,6 @@
       document.getElementById('detailedContent').innerHTML = html;
       document.getElementById('detailedModal').classList.add('active');
       document.body.style.overflow = 'hidden';
-      lucide.createIcons();
     }
 
     function closeDetailed() {

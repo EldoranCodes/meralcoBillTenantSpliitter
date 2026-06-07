@@ -5,7 +5,7 @@
 main meter
  - submeter1 (cel)
  -submeter2 (vic)
-  -submter2.submeter1 (mhiles)
+  -submter2.submeter1 (zyville)
   -submter2.submeter2 (FREDA)
 
 #input:
@@ -19,15 +19,15 @@ $RATE =  main meter price / main meter consumtion (kwh)
 ### compute the kwh consumed by tenants
 cel consumption = new submter1.reading - old submter1.reading 
 
-mhilesConsumption = new submter2.sumbter1.reading - old submter2.sumbter1.reading
+zyvilleConsumption = new submter2.sumbter1.reading - old submter2.sumbter1.reading
 ``
 fredaConsumtion = new submter2.sumbter2.reading - old submter2.sumbter2.reading
 
-vic consumption = new submter2.reading - old submter2.reading - mhilesConsumption() - fredaConsumtion() 
+vic consumption = new submter2.reading - old submter2.reading - zyvilleConsumption() - fredaConsumtion() 
 
 ### total all tenants consumption:
 
-tenantsTotalConsumption = cel + mhiles + vic + freda;
+tenantsTotalConsumption = cel + zyville + vic + freda;
 
 diffOrOverKwh = main meter consumptoin - tenantsTotalConsumption;
 
