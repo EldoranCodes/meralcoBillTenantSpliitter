@@ -4,26 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meralco Bill Splitter</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            heading: ['Lexend', 'sans-serif'],
-            body: ['Source Sans 3', 'sans-serif'],
-          },
-        },
-      },
-    }
-  </script>
+  <link href="styles/output.css" rel="stylesheet">
   <style>
-    body { font-family: 'Source Sans 3', sans-serif; }
-    .font-heading { font-family: 'Lexend', sans-serif; }
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .font-heading { font-family: system-ui, -apple-system, sans-serif; font-weight: 600; }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type="number"] { -moz-appearance: textfield; }
@@ -47,7 +31,7 @@
     <!-- Header -->
     <header class="flex items-center gap-4 mb-2">
       <div class="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center text-white shrink-0">
-        <i data-lucide="zap" class="w-5 h-5"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
       <div>
         <h1 class="text-xl sm:text-2xl font-heading font-bold text-slate-900">Meralco Bill Splitter</h1>
@@ -58,7 +42,7 @@
     <!-- Main Meter Card -->
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
       <h2 class="font-heading font-semibold text-base text-slate-800 mb-4 flex items-center gap-2">
-        <i data-lucide="gauge" class="w-5 h-5 text-blue-600"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-blue-600"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
         Main Meter Billing
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -84,7 +68,7 @@
     <!-- Tenants Card -->
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
       <h2 class="font-heading font-semibold text-base text-slate-800 mb-1 flex items-center gap-2">
-        <i data-lucide="layers" class="w-5 h-5 text-amber-500"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-amber-500"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         Tenant Submeter Readings
       </h2>
       <p class="text-sm text-slate-500 mb-5">Enter old and new meter readings for each tenant</p>
@@ -200,14 +184,14 @@
     <button id="calculateBtn"
       class="w-full py-3.5 px-6 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-sm rounded-xl transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
       onclick="calculateBilling()">
-      <i data-lucide="calculator" class="w-4 h-4"></i>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="8" x2="12" y1="14" y2="14"/><line x1="8" x2="12" y1="18" y2="18"/><line x1="16" x2="16" y1="14" y2="18"/><line x1="8" x2="16" y1="10" y2="10"/></svg>
       Calculate All Tenants Billing
     </button>
 
     <!-- Results Card -->
     <section id="resultsCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 hidden">
       <h2 class="font-heading font-semibold text-base text-slate-800 mb-1 flex items-center gap-2">
-        <i data-lucide="receipt" class="w-5 h-5 text-emerald-600"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-emerald-600"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
         Billing Results
       </h2>
 
@@ -221,7 +205,7 @@
       <button id="viewDetailedBtn"
         class="no-print mt-4 w-full py-3 px-6 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-heading font-semibold text-sm rounded-xl transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 hidden"
         onclick="openDetailed()">
-        <i data-lucide="file-text" class="w-4 h-4"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
         View Detailed Computation
       </button>
     </section>
@@ -234,7 +218,7 @@
       <div class="flex items-center justify-between p-5 border-b border-slate-200 no-print">
         <h2 class="font-heading font-semibold text-base text-slate-800">Detailed Billing Computation</h2>
         <button onclick="closeDetailed()" class="p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" aria-label="Close">
-          <i data-lucide="x" class="w-5 h-5 text-slate-500"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-slate-500"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
       <div class="p-5 overflow-y-auto space-y-6" id="detailedContent"></div>
@@ -243,7 +227,7 @@
           class="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer">Close</button>
         <button onclick="printDetailed()"
           class="px-4 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium font-heading hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-2">
-          <i data-lucide="printer" class="w-4 h-4"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3h12v6"/><rect width="12" height="8" x="6" y="14" rx="1"/></svg>
           Print
         </button>
       </div>
@@ -251,8 +235,6 @@
   </div>
 
   <script>
-    lucide.createIcons();
-
     function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
     function txt(id, val) { document.getElementById(id).textContent = val; }
     function html(id, val) { document.getElementById(id).innerHTML = val; }
@@ -349,8 +331,8 @@
       const valEl = document.getElementById('validationMsg');
       valEl.className = `mt-3 rounded-xl p-4 text-sm font-medium ${isValid ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-red-50 border border-red-200 text-red-800'}`;
       valEl.innerHTML = isValid
-        ? `<i data-lucide="check-circle" class="w-4 h-4 inline -mt-0.5 mr-1"></i> Validation passed &mdash; Total (₱${totalBill.toFixed(2)}) matches main billing (₱${mainBill.toFixed(2)})`
-        : `<i data-lucide="alert-triangle" class="w-4 h-4 inline -mt-0.5 mr-1"></i> Mismatch: Total (₱${totalBill.toFixed(2)}) vs Main Billing (₱${mainBill.toFixed(2)})`;
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 inline -mt-0.5 mr-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Validation passed &mdash; Total (₱${totalBill.toFixed(2)}) matches main billing (₱${mainBill.toFixed(2)})`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 inline -mt-0.5 mr-1"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Mismatch: Total (₱${totalBill.toFixed(2)}) vs Main Billing (₱${mainBill.toFixed(2)})`;
       valEl.classList.remove('hidden');
 
       const dotColors = { Cel: '#3B82F6', Zyville: '#10B981', Freda: '#A855F7', Vic: '#F59E0B' };
@@ -394,7 +376,6 @@
       window.__lastCalc = { mainBill, mainKwh, rate, celKwh, vicKwh, zyvilleKwh, fredaKwh, totalKwh, diff, adjust, adj, bills, totalBill, readings: { cel: { old: celOld, new: celNew }, zyville: { old: zyvilleOld, new: zyvilleNew }, freda: { old: fredaOld, new: fredaNew }, vic: { old: vicOld, new: vicNew } } };
 
       document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      lucide.createIcons();
     }
 
     function openDetailed() {
@@ -496,7 +477,6 @@
       document.getElementById('detailedContent').innerHTML = html;
       document.getElementById('detailedModal').classList.add('active');
       document.body.style.overflow = 'hidden';
-      lucide.createIcons();
     }
 
     function closeDetailed() {

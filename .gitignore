@@ -1,0 +1,6 @@
+node_modules/
+www/
+styles/output.css
+android/
+.capacitor/
+MeralcoBillSplitter.apk
