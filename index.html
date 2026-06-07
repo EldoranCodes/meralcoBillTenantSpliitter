@@ -3,395 +3,485 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Electricity Bill Splitter</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: #f5f7fa; min-height: 100vh; padding: 20px; }
-    .container { max-width: 900px; margin: 0 auto; }
-    h1 { text-align: center; color: #2c3e50; margin-bottom: 24px; }
-    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .card h2 { color: #34495e; margin-bottom: 16px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .form-group { display: flex; flex-direction: column; }
-    .form-group label { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
-    .form-group input { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
-    .form-group input:focus { outline: none; border-color: #3498db; }
-    .rate-display { background: #e8f5e9; padding: 12px; border-radius: 6px; text-align: center; margin-top: 12px; }
-    .rate-display .value { font-size: 1.4rem; font-weight: bold; color: #2e7d32; }
-    .rate-display .label { font-size: 0.8rem; color: #666; }
-    .tenant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .tenant-header h2 { border: none; padding: 0; margin: 0; }
-    .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
-    .btn-primary { background: #3498db; color: white; }
-    .btn-primary:hover { background: #2980b9; }
-    .btn-secondary { background: #95a5a6; color: white; }
-    .btn-danger { background: #e74c3c; color: white; padding: 8px 12px; font-size: 0.8rem; }
-    .btn-success { background: #27ae60; color: white; width: 100%; padding: 14px; font-size: 1rem; }
-    .btn-success:hover { background: #219a52; }
-    .tenant-list { display: flex; flex-direction: column; gap: 12px; }
-    .tenant-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-    .tenant-card-header { display: flex; align-items: center; gap: 10px; }
-    .tenant-card-header .btn-danger { padding: 6px 10px; font-size: 1rem; }
-    .tenant-card .tenant-num { font-weight: bold; color: #3498db; }
-    .tenant-card input { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; }
-    .tenant-card .tenant-name-input { font-size: 1rem; }
-    .tenant-card .tenant-readings { display: flex; gap: 10px; }
-    .tenant-card .tenant-readings input { flex: 1; }
-    .tenant-card .consumption { color: #666; font-size: 0.9rem; font-weight: 500; }
-    .results-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    .results-table th, .results-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-    .results-table th { background: #f8f9fa; font-weight: 600; color: #34495e; }
-    .results-table .num { text-align: right; }
-    .results-table .total-row { background: #e8f5e9; font-weight: bold; }
-    .difference-info { background: #fff3e0; padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 0.9rem; color: #e65100; }
-    .validation { padding: 12px; border-radius: 6px; margin-top: 12px; text-align: center; }
-    .validation.success { background: #e8f5e9; color: #2e7d32; }
-    .validation.error { background: #ffebee; color: #c62828; }
-    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-    .tenant-bill-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; color: white; }
-    .tenant-bill-card .tenant-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; }
-    .tenant-bill-card .consumption-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .tenant-bill-card .label { opacity: 0.9; font-size: 0.9rem; }
-    .tenant-bill-card .value { font-weight: 600; }
-    .tenant-bill-card .bill-amount { font-size: 1.4rem; font-weight: bold; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); }
-    .total-card { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; color: white; }
-    .total-card .total-label { font-size: 1.1rem; }
-    .total-card .total-value { font-size: 1.5rem; font-weight: bold; }
-    .empty-state { text-align: center; color: #999; padding: 40px; }
-  @media (max-width: 600px) {
-      body { padding: 12px; }
-      h1 { font-size: 1.5rem; margin-bottom: 16px; }
-      .card { padding: 16px; border-radius: 8px; }
-      .form-row { grid-template-columns: 1fr; gap: 12px; }
-      .tenant-card { padding: 14px; }
-      .tenant-card-header { justify-content: space-between; }
-      .tenant-readings { flex-direction: column; }
-      .results-grid { grid-template-columns: 1fr; gap: 12px; }
-      .tenant-bill-card { padding: 16px; }
-      .total-card { flex-direction: column; gap: 8px; text-align: center; }
-      .total-card .total-value { font-size: 1.3rem; }
-      .tenant-header { flex-direction: column; gap: 12px; align-items: stretch; }
-      .tenant-header .btn { width: 100%; }
+  <title>Meralco Bill Splitter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Lexend', 'sans-serif'],
+            body: ['Source Sans 3', 'sans-serif'],
+          },
+        },
+      },
     }
-
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; overflow: auto; }
-    .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .modal-content { background: white; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow: auto; display: flex; flex-direction: column; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #eee; }
-    .modal-header h2 { margin: 0; font-size: 1.2rem; }
-    .modal-body { padding: 20px; flex: 1; overflow: auto; }
-    .modal-footer { padding: 16px 20px; border-top: 1px solid #eee; display: flex; gap: 12px; justify-content: flex-end; }
-
-    .detailed-section { margin-bottom: 24px; }
-    .detailed-section h3 { color: #2c3e50; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #3498db; }
-    .detailed-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    .detailed-table th, .detailed-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
-    .detailed-table th { background: #f8f9fa; font-weight: 600; color: #34495e; }
-    .detailed-table .num { text-align: right; }
-    .detailed-table .total-row { background: #e8f5e9; font-weight: bold; }
-    .detailed-summary { background: #f8f9fa; padding: 16px; border-radius: 8px; }
-    .detailed-summary .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
-    .detailed-summary .summary-row:last-child { border-bottom: none; font-weight: bold; }
-
+  </script>
+  <style>
+    body { font-family: 'Source Sans 3', sans-serif; }
+    .font-heading { font-family: 'Lexend', sans-serif; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: 0s !important; animation-duration: 0s !important; }
+    }
+    .modal-overlay { display: none; }
+    .modal-overlay.active { display: flex; }
     @media print {
       body * { visibility: hidden; }
-      .modal, .modal * { visibility: visible; }
-      .modal { position: absolute; left: 0; top: 0; width: 100%; height: auto; background: white; }
-      .modal-content { max-width: 100%; max-height: none; box-shadow: none; }
-      .modal-header, .modal-footer { display: none; }
+      .modal-overlay, .modal-overlay * { visibility: visible; }
+      .modal-overlay { position: absolute; left: 0; top: 0; width: 100%; height: auto; background: white; display: block !important; padding: 0; }
+      .modal-overlay > div { max-width: 100%; max-height: none; box-shadow: none; border-radius: 0; }
+      .no-print { display: none !important; }
     }
-
   </style>
 </head>
-<body>
-  <div class="container">
-    <h1>⚡ Electricity Bill Splitter</h1>
-    
-    <div class="card">
-      <h2>Main Meter Billing</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Total Billing Price (₱)</label>
-          <input type="number" id="mainBilling" placeholder="e.g. 16431.76" step="0.01" onchange="calculateRate()">
-        </div>
-        <div class="form-group">
-          <label>Main Meter Consumption (kWh)</label>
-          <input type="number" id="mainConsumption" placeholder="e.g. 1084" onchange="calculateRate()">
-        </div>
-      </div>
-      <div class="rate-display">
-        <div class="label">Calculated Rate per kWh</div>
-        <div class="value" id="rateDisplay">₱0.00</div>
-      </div>
-    </div>
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-5">
 
-    <div class="card">
-      <div class="tenant-header">
-        <h2>Submeter Tenants (1-10)</h2>
+    <!-- Header -->
+    <header class="flex items-center gap-4 mb-2">
+      <div class="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center text-white shrink-0">
+        <i data-lucide="zap" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-heading font-bold text-slate-900">Meralco Bill Splitter</h1>
+        <p class="text-sm text-slate-500">Split main meter billing across 4 tenants</p>
+      </div>
+    </header>
+
+    <!-- Main Meter Card -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+      <h2 class="font-heading font-semibold text-base text-slate-800 mb-4 flex items-center gap-2">
+        <i data-lucide="gauge" class="w-5 h-5 text-blue-600"></i>
+        Main Meter Billing
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <button class="btn btn-secondary" onclick="addTenant()">+ Add Tenant</button>
+          <label for="mainBill" class="block text-sm font-medium text-slate-600 mb-1.5">Total Billing Price (₱)</label>
+          <input type="number" id="mainBill" step="0.01" min="0" placeholder="e.g. 16431.76"
+            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+            oninput="updateRate()">
+        </div>
+        <div>
+          <label for="mainKwh" class="block text-sm font-medium text-slate-600 mb-1.5">Main Meter Consumption (kWh)</label>
+          <input type="number" id="mainKwh" step="0.01" min="0" placeholder="e.g. 1084"
+            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+            oninput="updateRate()">
         </div>
       </div>
-      <div id="tenantList" class="tenant-list"></div>
-    </div>
+      <div class="mt-4 bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
+        <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Calculated Rate per kWh</p>
+        <p class="text-2xl font-bold text-blue-700 font-heading mt-0.5" id="rateDisplay">₱0.0000 <span class="text-sm font-normal text-slate-400">/kWh</span></p>
+      </div>
+    </section>
 
-    <button class="btn btn-success" onclick="calculateBilling()">Calculate All Tenants Billing</button>
-    <button class="btn btn-primary" id="viewDetailedBtn" style="display: none; width: 100%; margin-top: 12px;" onclick="viewDetailed()">View Detailed</button>
+    <!-- Tenants Card -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+      <h2 class="font-heading font-semibold text-base text-slate-800 mb-1 flex items-center gap-2">
+        <i data-lucide="layers" class="w-5 h-5 text-amber-500"></i>
+        Tenant Submeter Readings
+      </h2>
+      <p class="text-sm text-slate-500 mb-5">Enter old and new meter readings for each tenant</p>
 
-    <div class="card" id="resultsCard" style="display: none;">
-      <h2>Billing Results</h2>
-      <div id="differenceInfo" class="difference-info"></div>
-      <div id="totalSubmeterConsumption" class="difference-info" style="background: #e3f2fd; color: #1565c0;"></div>
-      <div id="validation" class="validation"></div>
-      <div id="resultsGrid" class="results-grid"></div>
-      <div id="totalCard" class="total-card"></div>
-    </div>
-
-    <div id="detailedModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Detailed Billing Computation</h2>
-          <button class="btn btn-danger" onclick="closeDetailed()">×</button>
+      <div class="space-y-4">
+        <!-- Cel -->
+        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>
+            <h3 class="font-heading font-semibold text-sm text-slate-700">Submeter 1: Cel</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="celOld" class="block text-xs font-medium text-slate-500 mb-1">Old Reading</label>
+              <input type="number" id="celOld" step="0.01" min="0" placeholder="0"
+                class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                oninput="updatePreviews()">
+            </div>
+            <div>
+              <label for="celNew" class="block text-xs font-medium text-slate-500 mb-1">New Reading</label>
+              <input type="number" id="celNew" step="0.01" min="0" placeholder="0"
+                class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                oninput="updatePreviews()">
+            </div>
+          </div>
+          <p class="mt-2 text-sm font-medium" id="celConsumption">Consumption: <span class="text-slate-400">0.00</span> kWh</p>
         </div>
-        <div class="modal-body" id="detailedContent"></div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" onclick="printDetailed()">Print</button>
+
+        <!-- Vic + nested subtenants -->
+        <div class="border-l-4 border-amber-400 pl-4 space-y-3">
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0"></span>
+              <h3 class="font-heading font-semibold text-sm text-slate-700">Submeter 2: Vic</h3>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="vicOld" class="block text-xs font-medium text-slate-500 mb-1">Old Reading</label>
+                <input type="number" id="vicOld" step="0.01" min="0" placeholder="0"
+                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  oninput="updatePreviews()">
+              </div>
+              <div>
+                <label for="vicNew" class="block text-xs font-medium text-slate-500 mb-1">New Reading</label>
+                <input type="number" id="vicNew" step="0.01" min="0" placeholder="0"
+                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  oninput="updatePreviews()">
+              </div>
+            </div>
+            <p class="mt-2 text-sm font-medium text-slate-500">Raw Submeter Reading: <span id="vicRawConsumption" class="text-slate-400">0.00</span> kWh</p>
+          </div>
+
+          <div class="ml-5 space-y-3">
+            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-2 h-2 rounded-full border-2 border-emerald-500 shrink-0"></span>
+                <h4 class="font-heading font-semibold text-xs text-slate-600 uppercase tracking-wider">Sub: Mhiles</h4>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="mhilesOld" class="block text-xs font-medium text-slate-500 mb-1">Old Reading</label>
+                  <input type="number" id="mhilesOld" step="0.01" min="0" placeholder="0"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
+                    oninput="updatePreviews()">
+                </div>
+                <div>
+                  <label for="mhilesNew" class="block text-xs font-medium text-slate-500 mb-1">New Reading</label>
+                  <input type="number" id="mhilesNew" step="0.01" min="0" placeholder="0"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
+                    oninput="updatePreviews()">
+                </div>
+              </div>
+              <p class="mt-2 text-sm font-medium" id="mhilesConsumption">Consumption: <span class="text-slate-400">0.00</span> kWh</p>
+            </div>
+
+            <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-2 h-2 rounded-full border-2 border-purple-500 shrink-0"></span>
+                <h4 class="font-heading font-semibold text-xs text-slate-600 uppercase tracking-wider">Sub: Freda</h4>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="fredaOld" class="block text-xs font-medium text-slate-500 mb-1">Old Reading</label>
+                  <input type="number" id="fredaOld" step="0.01" min="0" placeholder="0"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-colors"
+                    oninput="updatePreviews()">
+                </div>
+                <div>
+                  <label for="fredaNew" class="block text-xs font-medium text-slate-500 mb-1">New Reading</label>
+                  <input type="number" id="fredaNew" step="0.01" min="0" placeholder="0"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-colors"
+                    oninput="updatePreviews()">
+                </div>
+              </div>
+              <p class="mt-2 text-sm font-medium" id="fredaConsumption">Consumption: <span class="text-slate-400">0.00</span> kWh</p>
+            </div>
+          </div>
+
+          <div class="bg-amber-50 rounded-xl p-4 border border-amber-200 text-sm" id="vicBreakdown">
+            <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1.5">Vic's Actual Consumption</p>
+            <div class="space-y-0.5 text-slate-700">
+              <div class="flex justify-between"><span>Submeter Reading</span><span id="vicRawDisplay">0.00 kWh</span></div>
+              <div class="flex justify-between text-emerald-700"><span>&minus; Mhiles</span><span id="vicMinusMhiles">0.00 kWh</span></div>
+              <div class="flex justify-between text-purple-700"><span>&minus; Freda</span><span id="vicMinusFreda">0.00 kWh</span></div>
+              <div class="border-t border-amber-300 pt-0.5 flex justify-between font-bold text-amber-900"><span>Vic's Actual</span><span id="vicActualDisplay">0.00 kWh</span></div>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Calculate Button -->
+    <button id="calculateBtn"
+      class="w-full py-3.5 px-6 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-sm rounded-xl transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+      onclick="calculateBilling()">
+      <i data-lucide="calculator" class="w-4 h-4"></i>
+      Calculate All Tenants Billing
+    </button>
+
+    <!-- Results Card -->
+    <section id="resultsCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 hidden">
+      <h2 class="font-heading font-semibold text-base text-slate-800 mb-1 flex items-center gap-2">
+        <i data-lucide="receipt" class="w-5 h-5 text-emerald-600"></i>
+        Billing Results
+      </h2>
+
+      <div id="differenceInfo" class="mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4 text-sm text-orange-800 hidden"></div>
+      <div id="summaryInfo" class="mt-3 bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 hidden"></div>
+      <div id="validationMsg" class="mt-3 rounded-xl p-4 text-sm font-medium hidden"></div>
+
+      <div id="resultsGrid" class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+      <div id="totalCard" class="mt-4 bg-slate-900 rounded-xl p-5 flex justify-between items-center text-white hidden"></div>
+
+      <button id="viewDetailedBtn"
+        class="no-print mt-4 w-full py-3 px-6 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-heading font-semibold text-sm rounded-xl transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 hidden"
+        onclick="openDetailed()">
+        <i data-lucide="file-text" class="w-4 h-4"></i>
+        View Detailed Computation
+      </button>
+    </section>
+
+  </div>
+
+  <!-- Detailed Modal -->
+  <div id="detailedModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between p-5 border-b border-slate-200 no-print">
+        <h2 class="font-heading font-semibold text-base text-slate-800">Detailed Billing Computation</h2>
+        <button onclick="closeDetailed()" class="p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" aria-label="Close">
+          <i data-lucide="x" class="w-5 h-5 text-slate-500"></i>
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-6" id="detailedContent"></div>
+      <div class="flex justify-end gap-3 p-4 border-t border-slate-200 no-print">
+        <button onclick="closeDetailed()"
+          class="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer">Close</button>
+        <button onclick="printDetailed()"
+          class="px-4 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium font-heading hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-2">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          Print
+        </button>
       </div>
     </div>
   </div>
 
   <script>
-    let tenants = [];
-    let lastCalculation = null;
+    lucide.createIcons();
 
-    function init() {
-      addTenant();
-    }
+    function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+    function txt(id, val) { document.getElementById(id).textContent = val; }
+    function html(id, val) { document.getElementById(id).innerHTML = val; }
 
-    function calculateRate() {
-      const mainBilling = parseFloat(document.getElementById('mainBilling').value);
-      const mainConsumption = parseFloat(document.getElementById('mainConsumption').value);
-      
-      if (mainBilling && mainConsumption) {
-        const ratePerKwh = mainBilling / mainConsumption;
-        document.getElementById('rateDisplay').textContent = `₱${ratePerKwh.toFixed(4)}`;
+    function updateRate() {
+      const bill = getVal('mainBill');
+      const kwh = getVal('mainKwh');
+      if (bill > 0 && kwh > 0) {
+        html('rateDisplay', `₱${(bill / kwh).toFixed(4)} <span class="text-sm font-normal text-slate-400">/kWh</span>`);
       } else {
-        document.getElementById('rateDisplay').textContent = `₱0.00`;
+        html('rateDisplay', `₱0.0000 <span class="text-sm font-normal text-slate-400">/kWh</span>`);
       }
     }
 
-    function addTenant() {
-      if (tenants.length >= 10) {
-        alert('Maximum 10 tenants allowed');
-        return;
-      }
-      tenants.push({ name: '', oldRead: 0, newRead: 0 });
-      renderTenants();
+    function getTenantData() {
+      const celOld = getVal('celOld'), celNew = getVal('celNew');
+      const vicOld = getVal('vicOld'), vicNew = getVal('vicNew');
+      const mhilesOld = getVal('mhilesOld'), mhilesNew = getVal('mhilesNew');
+      const fredaOld = getVal('fredaOld'), fredaNew = getVal('fredaNew');
+
+      const celKwh = Math.max(0, celNew - celOld);
+      const mhilesKwh = Math.max(0, mhilesNew - mhilesOld);
+      const fredaKwh = Math.max(0, fredaNew - fredaOld);
+      const vicRaw = Math.max(0, vicNew - vicOld);
+      const vicKwh = Math.max(0, vicRaw - mhilesKwh - fredaKwh);
+
+      return { celKwh, vicKwh, mhilesKwh, fredaKwh, vicRaw };
     }
 
-    function removeTenant(index) {
-      if (tenants.length <= 1) {
-        alert('At least 1 tenant required');
-        return;
-      }
-      tenants.splice(index, 1);
-      renderTenants();
-    }
-
-    function updateTenant(index, field, value) {
-      tenants[index][field] = field === 'name' ? value : parseFloat(value) || 0;
-      const card = document.querySelectorAll('.tenant-card')[index];
-      if (card) {
-        const t = tenants[index];
-        const consumption = (t.oldRead > 0 && t.newRead > 0 && t.newRead >= t.oldRead) 
-          ? t.newRead - t.oldRead 
-          : 0;
-        card.querySelector('.consumption').textContent = `Usage: ${consumption} kWh`;
-      }
-    }
-
-    function getConsumption(index) {
-      const t = tenants[index];
-      return t.newRead >= t.oldRead ? t.newRead - t.oldRead : 0;
-    }
-
-    function renderTenants() {
-      const container = document.getElementById('tenantList');
-      container.innerHTML = tenants.map((t, i) => `
-        <div class="tenant-card">
-          <div class="tenant-card-header">
-            <button class="btn btn-danger" onclick="removeTenant(${i})">×</button>
-            <span class="tenant-num">Tenant ${i + 1}</span>
-          </div>
-          <input type="text" class="tenant-name-input" placeholder="Name" value="${t.name}" onchange="updateTenant(${i}, 'name', this.value)">
-          <div class="tenant-readings">
-            <input type="number" placeholder="Old" value="${t.oldRead || ''}" onchange="updateTenant(${i}, 'oldRead', this.value)">
-            <input type="number" placeholder="New" value="${t.newRead || ''}" onchange="updateTenant(${i}, 'newRead', this.value)">
-          </div>
-          <div class="consumption">Usage: ${getConsumption(i)} kWh</div>
-        </div>
-      `).join('');
+    function updatePreviews() {
+      const { celKwh, vicKwh, mhilesKwh, fredaKwh, vicRaw } = getTenantData();
+      html('celConsumption', `Consumption: <span class="text-slate-800 font-semibold">${celKwh.toFixed(2)}</span> kWh`);
+      html('mhilesConsumption', `Consumption: <span class="text-slate-800 font-semibold">${mhilesKwh.toFixed(2)}</span> kWh`);
+      html('fredaConsumption', `Consumption: <span class="text-slate-800 font-semibold">${fredaKwh.toFixed(2)}</span> kWh`);
+      txt('vicRawConsumption', vicRaw.toFixed(2));
+      txt('vicRawDisplay', `${vicRaw.toFixed(2)} kWh`);
+      txt('vicMinusMhiles', `${mhilesKwh.toFixed(2)} kWh`);
+      txt('vicMinusFreda', `${fredaKwh.toFixed(2)} kWh`);
+      txt('vicActualDisplay', `${vicKwh.toFixed(2)} kWh`);
     }
 
     function calculateBilling() {
-      const mainBilling = parseFloat(document.getElementById('mainBilling').value);
-      const mainConsumption = parseFloat(document.getElementById('mainConsumption').value);
+      const mainBill = getVal('mainBill');
+      const mainKwh = getVal('mainKwh');
 
-      if (!mainBilling || !mainConsumption) {
-        alert('Please enter main billing price and consumption');
+      if (!mainBill || !mainKwh) {
+        alert('Please enter both the total billing price and main meter consumption.');
         return;
       }
 
-      calculateRate();
+      updateRate();
+      const rate = mainBill / mainKwh;
+      const { celKwh, vicKwh, mhilesKwh, fredaKwh } = getTenantData();
+      const totalKwh = celKwh + mhilesKwh + fredaKwh + vicKwh;
+      const diff = mainKwh - totalKwh;
+      const adjust = diff / 4;
 
-      const ratePerKwh = mainBilling / mainConsumption;
+      const adj = {
+        cel: celKwh + adjust,
+        mhiles: mhilesKwh + adjust,
+        freda: fredaKwh + adjust,
+        vic: vicKwh + adjust,
+      };
 
-      const tenantConsumptions = tenants.map((_, i) => getConsumption(i));
-      const totalSubmeterConsumption = tenantConsumptions.reduce((a, b) => a + b, 0);
-      const diff = mainConsumption - totalSubmeterConsumption;
-      
-      let diffPerTenant;
-      if (totalSubmeterConsumption > mainConsumption) {
-        diffPerTenant = diff / tenants.length;
+      const bills = {
+        cel: adj.cel * rate,
+        mhiles: adj.mhiles * rate,
+        freda: adj.freda * rate,
+        vic: adj.vic * rate,
+      };
+
+      const totalBill = bills.cel + bills.mhiles + bills.freda + bills.vic;
+      const isValid = Math.abs(totalBill - mainBill) < 0.01;
+
+      const diffEl = document.getElementById('differenceInfo');
+      if (Math.abs(diff) > 0.001) {
+        const action = diff > 0 ? 'added to' : 'deducted from';
+        diffEl.className = `mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4 text-sm text-orange-800`;
+        diffEl.innerHTML = `<strong>Submeter Difference:</strong> ${Math.abs(diff).toFixed(2)} kWh ${diff > 0 ? 'under' : 'over'} the main meter reading. ${Math.abs(adjust).toFixed(2)} kWh will be ${action} each tenant's consumption.`;
+        diffEl.classList.remove('hidden');
       } else {
-        diffPerTenant = diff / tenants.length;
+        diffEl.classList.add('hidden');
       }
 
-      let diffMessage = '';
-      if (diff !== 0) {
-        const action = diff > 0 ? 'deducted from' : 'added to';
-        diffMessage = `Difference: ${Math.abs(diff).toFixed(2)} kWh (${Math.abs(diffPerTenant).toFixed(2)} per tenant will be ${action} consumption)`;
-      }
-      document.getElementById('differenceInfo').textContent = diffMessage;
-      document.getElementById('totalSubmeterConsumption').textContent = `Total Submeter Consumption: ${totalSubmeterConsumption.toFixed(2)} kWh`;
+      const sumEl = document.getElementById('summaryInfo');
+      sumEl.className = `mt-3 bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800`;
+      sumEl.innerHTML = `<strong>Total Submeter Consumption:</strong> ${totalKwh.toFixed(2)} kWh &middot; <strong>Main Meter:</strong> ${mainKwh.toFixed(2)} kWh`;
+      sumEl.classList.remove('hidden');
 
-      const adjustedConsumptions = tenantConsumptions.map(c => {
-        if (totalSubmeterConsumption > mainConsumption) {
-          return c - diffPerTenant;
-        } else {
-          return c + diffPerTenant;
-        }
-      });
-      const bills = adjustedConsumptions.map(c => c * ratePerKwh);
-      const totalBill = bills.reduce((a, b) => a + b, 0);
+      const valEl = document.getElementById('validationMsg');
+      valEl.className = `mt-3 rounded-xl p-4 text-sm font-medium ${isValid ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-red-50 border border-red-200 text-red-800'}`;
+      valEl.innerHTML = isValid
+        ? `<i data-lucide="check-circle" class="w-4 h-4 inline -mt-0.5 mr-1"></i> Validation passed &mdash; Total (₱${totalBill.toFixed(2)}) matches main billing (₱${mainBill.toFixed(2)})`
+        : `<i data-lucide="alert-triangle" class="w-4 h-4 inline -mt-0.5 mr-1"></i> Mismatch: Total (₱${totalBill.toFixed(2)}) vs Main Billing (₱${mainBill.toFixed(2)})`;
+      valEl.classList.remove('hidden');
 
-      const isValid = Math.abs(totalBill - mainBilling) < 0.01;
-      const validationEl = document.getElementById('validation');
-      validationEl.className = `validation ${isValid ? 'success' : 'error'}`;
-      validationEl.textContent = isValid 
-        ? `✓ Formula validated - Total matches main billing (₱${totalBill.toFixed(2)})`
-        : `⚠ Total mismatch: ₱${totalBill.toFixed(2)} vs ₱${mainBilling.toFixed(2)}`;
+      const dotColors = { Cel: '#3B82F6', Mhiles: '#10B981', Freda: '#A855F7', Vic: '#F59E0B' };
+      const tenants = [
+        { name: 'Cel', raw: celKwh, adj: adj.cel, bill: bills.cel },
+        { name: 'Mhiles', raw: mhilesKwh, adj: adj.mhiles, bill: bills.mhiles },
+        { name: 'Freda', raw: fredaKwh, adj: adj.freda, bill: bills.freda },
+        { name: 'Vic', raw: vicKwh, adj: adj.vic, bill: bills.vic },
+      ];
 
-      document.getElementById('resultsGrid').innerHTML = tenants.map((t, i) => `
-        <div class="tenant-bill-card">
-          <div class="tenant-name">${t.name || `Tenant ${i + 1}`}</div>
-          <div class="consumption-row">
-            <span class="label">Raw Consumption</span>
-            <span class="value">${tenantConsumptions[i].toFixed(2)} kWh</span>
+      const grid = document.getElementById('resultsGrid');
+      grid.innerHTML = tenants.map(t => `
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-heading font-semibold text-sm text-slate-700">${t.name}</span>
+            <span class="w-2.5 h-2.5 rounded-full" style="background:${dotColors[t.name]}"></span>
           </div>
-          <div class="consumption-row">
-            <span class="label">Adjusted Consumption</span>
-            <span class="value">${adjustedConsumptions[i].toFixed(2)} kWh</span>
+          <div class="space-y-1.5 text-sm">
+            <div class="flex justify-between text-slate-500"><span>Raw Consumption</span><span class="font-medium text-slate-700">${t.raw.toFixed(2)} kWh</span></div>
+            <div class="flex justify-between text-slate-500"><span>Adjusted</span><span class="font-medium text-slate-700">${t.adj.toFixed(2)} kWh</span></div>
+            <div class="flex justify-between text-slate-500"><span>Rate</span><span class="font-medium text-slate-700">₱${rate.toFixed(4)}</span></div>
           </div>
-          <div class="consumption-row">
-            <span class="label">Rate</span>
-            <span class="value">₱${ratePerKwh.toFixed(4)}/kWh</span>
+          <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-end">
+            <span class="text-xs text-slate-400">Bill Amount</span>
+            <span class="font-heading font-bold text-lg text-slate-900">₱${t.bill.toFixed(2)}</span>
           </div>
-          <div class="bill-amount">₱${bills[i].toFixed(2)}</div>
         </div>
       `).join('');
 
-      document.getElementById('totalCard').innerHTML = `
-        <span class="total-label">Total Billing</span>
-        <span class="total-value">₱${totalBill.toFixed(2)}</span>
+      const totalEl = document.getElementById('totalCard');
+      totalEl.className = `mt-4 bg-slate-900 rounded-xl p-5 flex justify-between items-center text-white`;
+      totalEl.innerHTML = `
+        <span class="font-heading font-semibold text-sm">Total Billing</span>
+        <span class="font-heading font-bold text-xl">₱${totalBill.toFixed(2)}</span>
       `;
+      totalEl.classList.remove('hidden');
 
-      lastCalculation = {
-        mainBilling, mainConsumption, ratePerKwh, tenantConsumptions, 
-        totalSubmeterConsumption, diff, diffPerTenant, adjustedConsumptions, bills, totalBill
-      };
+      document.getElementById('resultsCard').classList.remove('hidden');
+      document.getElementById('viewDetailedBtn').classList.remove('hidden');
 
-      document.getElementById('resultsCard').style.display = 'block';
-      document.getElementById('viewDetailedBtn').style.display = 'block';
+      window.__lastCalc = { mainBill, mainKwh, rate, celKwh, vicKwh, mhilesKwh, fredaKwh, totalKwh, diff, adjust, adj, bills, totalBill };
+
+      document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      lucide.createIcons();
     }
 
-    function viewDetailed() {
-      if (!lastCalculation) return;
-      const { mainBilling, mainConsumption, ratePerKwh, tenantConsumptions, 
-        totalSubmeterConsumption, diff, diffPerTenant, adjustedConsumptions, bills, totalBill } = lastCalculation;
+    function openDetailed() {
+      const d = window.__lastCalc;
+      if (!d) return;
 
-      const diffType = totalSubmeterConsumption > mainConsumption ? 'Deducted' : 'Added';
-      const diffAction = totalSubmeterConsumption > mainConsumption ? 'subtracted from' : 'added to';
+      const tData = [
+        { name: 'Cel', raw: d.celKwh, adj: d.adj.cel, bill: d.bills.cel },
+        { name: 'Mhiles', raw: d.mhilesKwh, adj: d.adj.mhiles, bill: d.bills.mhiles },
+        { name: 'Freda', raw: d.fredaKwh, adj: d.adj.freda, bill: d.bills.freda },
+        { name: 'Vic', raw: d.vicKwh, adj: d.adj.vic, bill: d.bills.vic },
+      ];
+
+      const diffDir = d.diff >= 0 ? 'Added' : 'Deducted';
 
       let html = `
-        <div class="detailed-section">
-          <h3>Main Meter Summary</h3>
-          <div class="detailed-summary">
-            <div class="summary-row"><span>Total Billing Price</span><span>₱${mainBilling.toFixed(2)}</span></div>
-            <div class="summary-row"><span>Main Meter Consumption</span><span>${mainConsumption.toFixed(2)} kWh</span></div>
-            <div class="summary-row"><span>Calculated Rate per kWh</span><span>₱${ratePerKwh.toFixed(4)}</span></div>
+        <div>
+          <h3 class="font-heading font-semibold text-sm text-slate-800 mb-3 pb-2 border-b-2 border-blue-500">Main Meter Summary</h3>
+          <div class="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-slate-500">Total Billing Price</span><span class="font-medium">₱${d.mainBill.toFixed(2)}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Main Meter Consumption</span><span class="font-medium">${d.mainKwh.toFixed(2)} kWh</span></div>
+            <div class="flex justify-between text-blue-700 font-semibold"><span>Calculated Rate per kWh</span><span>₱${d.rate.toFixed(4)}</span></div>
           </div>
         </div>
-        <div class="detailed-section">
-          <h3>Submeter Consumption Summary</h3>
-          <div class="detailed-summary">
-            <div class="summary-row"><span>Total Submeter Reading</span><span>${totalSubmeterConsumption.toFixed(2)} kWh</span></div>
-            <div class="summary-row"><span>Main Meter Reading</span><span>${mainConsumption.toFixed(2)} kWh</span></div>
-            <div class="summary-row"><span>Difference</span><span>${diff.toFixed(2)} kWh</span></div>
-            <div class="summary-row"><span>Difference per Tenant</span><span>${Math.abs(diffPerTenant).toFixed(2)} kWh (${diffType} from each)</span></div>
+        <div>
+          <h3 class="font-heading font-semibold text-sm text-slate-800 mb-3 pb-2 border-b-2 border-amber-500">Consumption Difference</h3>
+          <div class="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-slate-500">Total Submeter Reading</span><span class="font-medium">${d.totalKwh.toFixed(2)} kWh</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Main Meter Reading</span><span class="font-medium">${d.mainKwh.toFixed(2)} kWh</span></div>
+            <div class="flex justify-between ${Math.abs(d.diff) < 0.001 ? 'text-emerald-700' : 'text-orange-700'} font-semibold"><span>Difference</span><span>${d.diff.toFixed(2)} kWh</span></div>
+            <div class="flex justify-between text-slate-500"><span>Adjustment per Tenant</span><span class="font-medium">${Math.abs(d.adjust).toFixed(2)} kWh (${diffDir})</span></div>
           </div>
         </div>
-        <div class="detailed-section">
-          <h3>Tenant Billing Details</h3>
-          <table class="detailed-table">
-            <thead>
-              <tr><th>#</th><th>Tenant</th><th>Old</th><th>New</th><th>Raw (kWh)</th><th>Adj. (kWh)</th><th>Rate</th><th>Bill (₱)</th></tr>
-            </thead>
-            <tbody>
-      `;
-
-      tenants.forEach((t, i) => {
-        html += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${t.name || `Tenant ${i + 1}`}</td>
-            <td class="num">${t.oldRead}</td>
-            <td class="num">${t.newRead}</td>
-            <td class="num">${tenantConsumptions[i].toFixed(2)}</td>
-            <td class="num">${adjustedConsumptions[i].toFixed(2)}</td>
-            <td class="num">₱${ratePerKwh.toFixed(4)}</td>
-            <td class="num">₱${bills[i].toFixed(2)}</td>
-          </tr>
-        `;
-      });
-
-      html += `
-            <tr class="total-row">
-              <td colspan="4">TOTAL</td>
-              <td class="num">${tenantConsumptions.reduce((a,b)=>a+b,0).toFixed(2)}</td>
-              <td class="num">${adjustedConsumptions.reduce((a,b)=>a+b,0).toFixed(2)}</td>
-              <td></td>
-              <td class="num">₱${totalBill.toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div>
+          <h3 class="font-heading font-semibold text-sm text-slate-800 mb-3 pb-2 border-b-2 border-emerald-500">Tenant Billing Details</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
+                  <th class="text-left p-3 font-semibold">Tenant</th>
+                  <th class="text-right p-3 font-semibold">Raw (kWh)</th>
+                  <th class="text-right p-3 font-semibold">Adj. (kWh)</th>
+                  <th class="text-right p-3 font-semibold">Rate</th>
+                  <th class="text-right p-3 font-semibold">Bill (₱)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tData.map(t => `
+                  <tr class="border-b border-slate-100">
+                    <td class="p-3 font-medium text-slate-700">${t.name}</td>
+                    <td class="p-3 text-right text-slate-600">${t.raw.toFixed(2)}</td>
+                    <td class="p-3 text-right text-slate-600">${t.adj.toFixed(2)}</td>
+                    <td class="p-3 text-right text-slate-600">₱${d.rate.toFixed(4)}</td>
+                    <td class="p-3 text-right font-semibold text-slate-800">₱${t.bill.toFixed(2)}</td>
+                  </tr>
+                `).join('')}
+                <tr class="bg-slate-50 font-bold text-slate-800">
+                  <td class="p-3">TOTAL</td>
+                  <td class="p-3 text-right">${d.totalKwh.toFixed(2)}</td>
+                  <td class="p-3 text-right">${(d.adj.cel + d.adj.mhiles + d.adj.freda + d.adj.vic).toFixed(2)}</td>
+                  <td class="p-3 text-right"></td>
+                  <td class="p-3 text-right text-blue-700">₱${d.totalBill.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
 
       document.getElementById('detailedContent').innerHTML = html;
       document.getElementById('detailedModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
     }
 
     function closeDetailed() {
       document.getElementById('detailedModal').classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     function printDetailed() {
       window.print();
     }
 
-    init();
+    // Close modal on overlay click
+    document.getElementById('detailedModal').addEventListener('click', function(e) {
+      if (e.target === this) closeDetailed();
+    });
+
+    // Init
+    updateRate();
   </script>
 </body>
 </html>
